@@ -1,0 +1,22 @@
+.keyboard {
+  display: inline-block;
+  text-align: center;
+}
+.row {
+  margin: 6px 0;
+}
+.key {
+  width: 36px;
+  height: 36px;
+  margin: 3px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1e6bd6; /* Grundfarbe blau */
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.key.correct { background-color: #2e7d32; } /* grün */
+.key.wrong { background-color: #c62828; }   /* rot */
+.key.neutral { background-color: #1e6bd6; } /* blau */
+.key:disabled { opacity: 0.7; cursor: default; }

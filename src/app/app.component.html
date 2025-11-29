@@ -1,0 +1,52 @@
+<div class="container">
+  <!-- Titel -->
+  <header class="title-row section-box">
+    <h1>Hangman</h1>
+  </header>
+
+  <!-- Linke Spalte -->
+  <section class="left section-box">
+    <app-hangman-canvas
+      [errorsCount]="vm.errorsCount"
+      [maxStrokes]="15">
+    </app-hangman-canvas>
+  </section>
+
+  <!-- Rechte Spalte -->
+  <section class="right">
+    <!-- Bereich 4: Wort + Status -->
+    <div class="word-zone section-box">
+      <app-status-dialog
+        [status]="vm.lastStatus"
+        [message]="vm.lastMessage">
+      </app-status-dialog>
+
+      <app-word-display
+        [maskedWord]="vm.maskedWord"
+        [errorsCount]="vm.errorsCount">
+      </app-word-display>
+    </div>
+
+    <!-- Bereich 5: Tastatur -->
+    <div class="keyboard-zone section-box">
+      <app-keyboard
+        [keyStates]="vm.keyStates"
+        (letterClicked)="onLetterClicked($event)">
+      </app-keyboard>
+    </div>
+  </section>
+
+   <!-- Bereich 6: Footer -->
+  <footer class="footer-row section-box">
+    <div class="footer-left">
+      (C) 2025 Gruppe A - Stina Katenkamp, Thomas Schmidt, Tom Mohr, Andrej Zozulya
+    </div>
+    <div class="footer-center">
+      Modul SWL WS 2025/2026
+    </div>
+    <div class="footer-right">
+      Ver.: 1.0
+    </div>
+  </footer>
+</div>
+

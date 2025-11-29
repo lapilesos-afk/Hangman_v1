@@ -1,0 +1,15 @@
+<div class="keyboard">
+  <div class="row" *ngFor="let row of rows">
+    <button *ngFor="let k of row"
+        class="key"
+        [ngClass]="{
+          correct: keyStates[k] === 'correct',
+          wrong: keyStates[k] === 'wrong',
+          neutral: !keyStates[k] || keyStates[k] === 'neutral'
+        }"
+        (click)="onClick(k)">
+  {{ k }}
+</button>
+
+  </div>
+</div>

@@ -1,0 +1,70 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Bereich 1: Titel */
+.title-row {
+  grid-column: span 2;
+  text-align: center;
+}
+
+/* Bereich 6: Footer */
+.footer-row {
+  grid-column: span 2;          /* über beide Spalten */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Box-Design für alle Bereiche */
+.section-box {
+  background-color: #f5f5f5;   /* leichtes Grau */
+  border: 2px solid #ccc;      /* grauer Rahmen */
+  border-radius: 12px;         /* abgerundet */
+  padding: 16px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;     /* Inhalt horizontal zentrieren */
+  align-items: center;         /* Inhalt vertikal zentrieren */
+}
+
+/* Bereich 2: Hangman */
+.left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Bereich 4 + 5: rechte Spalte */
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.word-zone,
+.keyboard-zone {
+  flex: 1;                     /* beide gleich groß */
+  min-height: 300px;           /* gleiche Höhe wie Bereich 2 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Footer-Inhalte */
+.footer-left {
+  text-align: left;
+}
+
+.footer-center {
+  text-align: center;
+  flex: 1;
+}
+
+.footer-right {
+  text-align: right;
+}

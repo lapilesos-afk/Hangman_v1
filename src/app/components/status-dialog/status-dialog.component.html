@@ -1,0 +1,5 @@
+<div class="status" [ngClass]="status">
+  <span *ngIf="status === 'correct'">Der Buchstabe wurde gefunden</span>
+  <span *ngIf="status === 'wrong'">Der Buchstabe wurde nicht gefunden</span>
+  <span *ngIf="status === 'neutral'">{{ message }}</span>
+</div>
