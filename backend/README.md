@@ -2,7 +2,7 @@
 
 ## Overview
 
-Complete Java Spring Boot backend service for the Hangman game, implementing the REST API according to the PlantUML sequence diagram.
+Complete Java Spring Boot backend service for the Hangman game, implementing the REST API.
 
 ## Architecture
 

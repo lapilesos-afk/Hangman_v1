@@ -37,6 +37,99 @@
           }
         }
       }
+    },
+    {
+      "label": "maven: clean compile -DskipTests (backend)",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "clean",
+        "compile",
+        "-DskipTests",
+        "-f",
+        "backend/pom.xml"
+      ],
+      "cwd": "${workspaceFolder}",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": "$maven"
+    },
+    {
+      "label": "maven: spring-boot:run (backend debug)",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "spring-boot:run",
+        "-f",
+        "backend/pom.xml",
+        "-DskipTests"
+      ],
+      "cwd": "${workspaceFolder}",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": {
+        "pattern": "$maven",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": ".*BUILD SUCCESS.*"
+          },
+          "endsPattern": {
+            "regexp": ".*Tomcat started.*"
+          }
+        }
+      }
+    },
+    {
+      "label": "java: start debug server (backend)",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "cd backend && set JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 && mvn spring-boot:run -DskipTests"
+      ],
+      "cwd": "${workspaceFolder}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": {
+        "pattern": "$maven",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": ".*Started HangmanServiceApplication.*|.*Tomcat started.*"
+          },
+          "endsPattern": {
+            "regexp": ".*Press Ctrl\\+C to stop.*"
+          }
+        }
+      }
     }
   ]
 }

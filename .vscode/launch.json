@@ -2,6 +2,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+    
     {
       "name": "ng serve",
       "type": "chrome",
@@ -15,6 +16,29 @@
       "request": "launch",
       "preLaunchTask": "npm: test",
       "url": "http://localhost:9876/debug.html"
+    },
+    {
+      "name": "Backend Debug (Java)",
+      "type": "java",
+      "name": "Spring Boot App",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "mainClass": "com.hangman.HangmanServiceApplication",
+      "projectName": "hangman-service",
+      "preLaunchTask": "maven: clean compile -DskipTests (backend)",
+      "args": "",
+      "vmArgs": "-Xmx512m -Xms256m",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Attach to Java Process (Remote Debug)",
+      "type": "java",
+      "name": "Attach",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "preLaunchTask": "java: start debug server (backend)"
     }
   ]
 }
