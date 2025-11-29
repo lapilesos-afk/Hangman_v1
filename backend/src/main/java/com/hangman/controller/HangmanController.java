@@ -21,6 +21,7 @@ public class HangmanController {
     
     /**
      * Start a new game
+     * Test Kommentar
      * POST /api/games
      * @return 201 Created with game details (id, maskedWord, failedAttempts)
      */
