@@ -1,16 +1,29 @@
+/* Container für Wortanzeige und Status */
 .word-display {
   text-align: center;
   font-family: Arial, sans-serif;
   margin: 10px;
+
 }
 
+/* Das zu erratende Wort */
 .masked-word {
-  font-size: 2rem;
+ font-size: 2rem;
   letter-spacing: 0.3rem;
 }
 
+/* Fehlversuche-Anzeige */
 .errors {
   margin-top: 1.5cm;   /* Abstand nach unten */
   font-size: 1.2rem;
   color: #333;
+}
+
+/* Meldung bei falschem Buchstaben */
+.message {
+  text-align: center;
+  color: red;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
 }

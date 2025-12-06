@@ -68,3 +68,16 @@
 .footer-right {
   text-align: right;
 }
+.status {
+  text-align: center;
+  font-size: 18px;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.message {
+  text-align: center;
+  color: red;
+  margin: 10px 0;
+}
+

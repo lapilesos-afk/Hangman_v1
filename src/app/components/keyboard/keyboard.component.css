@@ -1,22 +1,51 @@
-.keyboard {
-  display: inline-block;
-  text-align: center;
-}
-.row {
-  margin: 6px 0;
-}
+/* Basis-Design für alle Tasten */
 .key {
-  width: 36px;
-  height: 36px;
-  margin: 3px;
-  border: none;
-  border-radius: 6px;
-  background-color: #1e6bd6; /* Grundfarbe blau */
-  color: #fff;
-  font-weight: 600;
+  background-color: blue;
+  color: white;
+  border: 1px solid #333;
+  padding: 10px;
+  margin: 5px;
   cursor: pointer;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: bold;
+  min-width: 40px;   /* sorgt für gleichmäßige Breite */
 }
-.key.correct { background-color: #2e7d32; } /* grün */
-.key.wrong { background-color: #c62828; }   /* rot */
-.key.neutral { background-color: #1e6bd6; } /* blau */
-.key:disabled { opacity: 0.7; cursor: default; }
+
+/* Richtige Eingabe */
+.key.correct {
+  background-color: green;
+  color: white;
+}
+
+/* Falsche Eingabe */
+.key.wrong {
+  background-color: red;
+  color: white;
+}
+
+/* Bereits benutzte Taste deaktiviert */
+.key.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Container für die gesamte Tastatur */
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* zentriert alle Reihen horizontal */
+  margin-top: 20px;
+}
+
+/* Jede Reihe */
+.row {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+/* Speziell für die letzte Reihe (U–Z) */
+.row-center {
+  justify-content: center; /* explizit zentriert */
+}

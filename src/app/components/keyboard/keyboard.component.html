@@ -1,15 +1,34 @@
-<div class="keyboard">
-  <div class="row" *ngFor="let row of rows">
-    <button *ngFor="let k of row"
-        class="key"
-        [ngClass]="{
-          correct: keyStates[k] === 'correct',
-          wrong: keyStates[k] === 'wrong',
-          neutral: !keyStates[k] || keyStates[k] === 'neutral'
-        }"
-        (click)="onClick(k)">
-  {{ k }}
-</button>
+<div class="keyboard" *ngIf="vm$ | async as vm">
+  <!-- Erste Reihe -->
+  <div class="row">
+    <button *ngFor="let letter of lettersRow1"
+            class="key"
+            [ngClass]="vm.keyStates[letter]"
+            (click)="onGuess(letter)"
+            [disabled]="vm.keyStates[letter] !== 'neutral'">
+      {{ letter }}
+    </button>
+  </div>
 
+  <!-- Zweite Reihe -->
+  <div class="row">
+    <button *ngFor="let letter of lettersRow2"
+            class="key"
+            [ngClass]="vm.keyStates[letter]"
+            (click)="onGuess(letter)"
+            [disabled]="vm.keyStates[letter] !== 'neutral'">
+      {{ letter }}
+    </button>
+  </div>
+
+  <!-- Dritte Reihe -->
+  <div class="row row-center">
+    <button *ngFor="let letter of lettersRow3"
+            class="key"
+            [ngClass]="vm.keyStates[letter]"
+            (click)="onGuess(letter)"
+            [disabled]="vm.keyStates[letter] !== 'neutral'">
+      {{ letter }}
+    </button>
   </div>
 </div>

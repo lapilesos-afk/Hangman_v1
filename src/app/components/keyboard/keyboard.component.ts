@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { GameService, GameVM } from '../../services/game.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-keyboard',
@@ -10,16 +11,26 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./keyboard.component.css']
 })
 export class KeyboardComponent {
-  @Input() keyStates: Record<string, 'neutral' | 'correct' | 'wrong'> = {};
+  // Eingaben vom Parent (AppComponent)
+  @Input() keyStates!: Record<string, 'neutral' | 'correct' | 'wrong'>;
+
+  // Drei Reihen von Buchstaben
+  lettersRow1: string[] = 'ABCDEFGHIJ'.split('');
+  lettersRow2: string[] = 'KLMNOPQRST'.split('');
+  lettersRow3: string[] = 'UVWXYZ'.split('');
+
+  // Ausgabe-Event: Parent bekommt den geklickten Buchstaben
   @Output() letterClicked = new EventEmitter<string>();
 
-  rows: string[][] = [
-    ['A','B','C','D','E','F','G','H','I','J'],
-    ['K','L','M','N','O','P','Q','R','S','T'],
-    ['U','V','W','X','Y','Z']
-  ];
+  // ViewModel aus dem GameService
+  vm$: Observable<GameVM>;
 
-  onClick(k: string) {
-    this.letterClicked.emit(k);
+  constructor(private game: GameService) {
+    this.vm$ = this.game.vm$;
+  }
+
+  // Methode, die beim Klick aufgerufen wird
+  onGuess(letter: string) {
+    this.letterClicked.emit(letter);
   }
 }

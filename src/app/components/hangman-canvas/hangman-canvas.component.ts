@@ -14,7 +14,18 @@ export class HangmanCanvasComponent implements OnChanges {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   ngOnChanges() {
-    this.draw();
+    // Nur zeichnen, wenn es mindestens einen Fehler gibt
+    if (this.errorsCount > 0) {
+      this.draw();
+    } else {
+      this.clear();
+    }
+  }
+
+  private clear() {
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   private draw() {
@@ -29,32 +40,21 @@ export class HangmanCanvasComponent implements OnChanges {
 
     // Stroke definitions (15 steps): base, post, beam, rope, head, body, arms, legs, details
     const steps = [
-      // Sockel (gerade unter dem Pfosten)
-      () => this.line(ctx, 50, h - 20, 150, h - 20),
-      // Pfosten
-      () => this.line(ctx, 100, h - 20, 100, 40),
-      // Querbalken
-      () => this.line(ctx, 100, 40, 200, 40),
-      // Seil
-      () => this.line(ctx, 200, 40, 200, 80),
-      // Kopf
-      () => this.circle(ctx, 200, 100, 20),
-      // Körper
-      () => this.line(ctx, 200, 120, 200, 180),
-      // Arme
-      () => this.line(ctx, 200, 140, 170, 160), // links
-      () => this.line(ctx, 200, 140, 230, 160), // rechts
-      // Beine
-      () => this.line(ctx, 200, 180, 175, 220), // links
-      () => this.line(ctx, 200, 180, 225, 220), // rechts
-      // Sockel-Details
-      () => this.line(ctx, 80, h - 20, 100, h - 35),
+      () => this.line(ctx, 50, h - 20, 150, h - 20), // Sockel
+      () => this.line(ctx, 100, h - 20, 100, 40),    // Pfosten
+      () => this.line(ctx, 100, 40, 200, 40),        // Querbalken
+      () => this.line(ctx, 200, 40, 200, 80),        // Seil
+      () => this.circle(ctx, 200, 100, 20),          // Kopf
+      () => this.line(ctx, 200, 120, 200, 180),      // Körper
+      () => this.line(ctx, 200, 140, 170, 160),      // Arm links
+      () => this.line(ctx, 200, 140, 230, 160),      // Arm rechts
+      () => this.line(ctx, 200, 180, 175, 220),      // Bein links
+      () => this.line(ctx, 200, 180, 225, 220),      // Bein rechts
+      () => this.line(ctx, 80, h - 20, 100, h - 35), // Sockel-Detail
       () => this.line(ctx, 100, h - 35, 120, h - 20),
-      // Mund (unterhalb der Augen, y=115)
-      () => this.line(ctx, 190, 115, 210, 115),
-      // Augen
-      () => this.circle(ctx, 192, 95, 2), // links
-      () => this.circle(ctx, 208, 95, 2)  // rechts
+      () => this.line(ctx, 190, 115, 210, 115),      // Mund
+      () => this.circle(ctx, 192, 95, 2),            // Auge links
+      () => this.circle(ctx, 208, 95, 2)             // Auge rechts
     ];
 
     const count = Math.min(this.errorsCount, this.maxStrokes);

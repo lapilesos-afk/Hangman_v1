@@ -6,6 +6,11 @@
 
   <!-- Linke Spalte -->
   <section class="left section-box">
+    <!-- Fehlversuche mittig 
+    <div class="status">
+      Fehlversuche: {{ vm.errorsCount }}/15
+    </div> -->
+
     <app-hangman-canvas
       [errorsCount]="vm.errorsCount"
       [maxStrokes]="15">
@@ -16,10 +21,10 @@
   <section class="right">
     <!-- Bereich 4: Wort + Status -->
     <div class="word-zone section-box">
-      <app-status-dialog
-        [status]="vm.lastStatus"
-        [message]="vm.lastMessage">
-      </app-status-dialog>
+      <!-- Meldung nur anzeigen, wenn vorhanden 
+      <div class="message" *ngIf="vm.lastMessage">
+        {{ vm.lastMessage }}
+      </div> -->
 
       <app-word-display
         [maskedWord]="vm.maskedWord"
@@ -36,7 +41,7 @@
     </div>
   </section>
 
-   <!-- Bereich 6: Footer -->
+  <!-- Bereich 6: Footer -->
   <footer class="footer-row section-box">
     <div class="footer-left">
       (C) 2025 Gruppe A - Stina Katenkamp, Thomas Schmidt, Tom Mohr, Andrej Zozulya
@@ -49,4 +54,3 @@
     </div>
   </footer>
 </div>
-

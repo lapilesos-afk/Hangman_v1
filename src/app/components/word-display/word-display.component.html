@@ -1,8 +1,17 @@
-<div class="word-display">
-  <div class="masked-word">
-    {{ maskedWord }}
+<div class="word-display" *ngIf="vm$ | async as vm">
+  <!-- Meldung nur anzeigen, wenn vorhanden -->
+  <div class="message" *ngIf="vm.lastMessage">
+    {{ vm.lastMessage }}
   </div>
+
+  <!-- Wort mittig mit Abständen -->
+  <div class="masked-word">
+    {{ vm.maskedWord }}
+  </div>
+
+  <!-- Fehlversuche mittig -->
   <div class="errors">
-    Anzahl der Fehlversuche: {{ errorsCount }}
+    Fehlversuche: {{ vm.errorsCount }} / 15
   </div>
 </div>
+

@@ -1,24 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-
-export type GuessStatus = 'correct' | 'wrong' | 'neutral';
+import { BehaviorSubject } from 'rxjs';
 
 export interface GameVM {
   maskedWord: string;
   errorsCount: number;
   keyStates: Record<string, 'neutral' | 'correct' | 'wrong'>;
-  lastStatus: GuessStatus;
+  lastStatus: 'neutral' | 'correct' | 'wrong'; 
   lastMessage: string;
-}
-
-interface GameResponse {
-  id: string;
-  maskedWord: string;
-  failedAttempts: number;
-  maxAttempts: number;
-  status: string;
-  message?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,77 +21,65 @@ export class GameService {
   });
   vm$ = this.vmSubject.asObservable();
 
-  // Use full backend URL in dev (Angular dev server runs on 4200)
-  private apiBase = 'http://localhost:8080/api/games';
-  private currentGameId: string | null = null;
-
-  constructor(private http: HttpClient) {}
+// private baseUrl = 'https://fec23180-6141-4c18-bf41-9c61221235d1.mock.pstmn.io/api/hangman';
+ private baseUrl = 'http://localhost:8080/api/games';
+ // private baseUrl = 'http://localhost:8080/api/hangman'; 
+ 
+ constructor(private http: HttpClient) {}
 
   startGame() {
-    this.http.post<GameResponse>(this.apiBase, {}).subscribe({
+    this.http.post<{ id: Number; maskedWord: string; failedAttempts: number }>(
+      `${this.baseUrl},  // /startGame`, //previous /start
+      {id:0, Buchstabe:''}
+    ).subscribe({
       next: res => {
-        this.currentGameId = res.id;
+        //console.log('POST /start erfolgreich, Antwort:', res);
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
         const keyStates: Record<string, 'neutral' | 'correct' | 'wrong'> = {};
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => keyStates[l] = 'neutral');
-
-        // If maskedWord contains letters, mark those keys as correct
-        const visible = (res.maskedWord || '').toUpperCase();
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => {
-          if (visible.includes(l)) keyStates[l] = 'correct';
-        });
+        letters.forEach(l => keyStates[l] = 'neutral');
 
         this.vmSubject.next({
-          maskedWord: res.maskedWord || '',
-          errorsCount: res.failedAttempts || 0,
+          maskedWord: res.maskedWord,
+          errorsCount: res.failedAttempts,
           keyStates,
           lastStatus: 'neutral',
-          lastMessage: res.message || ''
+          lastMessage: ''
         });
       },
       error: err => {
+        console.error('POST /start fehlgeschlagen:', err);
         this.vmSubject.next({
-          maskedWord: '',
-          errorsCount: 0,
-          keyStates: {},
-          lastStatus: 'neutral',
-          lastMessage: 'Failed to start game: ' + (err?.message || err)
+          ...this.vmSubject.value,
+          lastStatus: 'wrong',
+          lastMessage: err.status === 404 ? 'Spiel nicht gefunden' : 'Serverfehler'
         });
       }
     });
   }
 
   guessLetter(letter: string) {
-    if (!letter) return;
-    if (!this.currentGameId) {
-      // start a new game if none exists
-      this.startGame();
-      return;
-    }
-
-    const payload = { id: this.currentGameId, letter };
-    this.http.post<GameResponse>(`${this.apiBase}/guess`, payload).subscribe({
+    this.http.post<{ maskedWord: string; failedAttempts: number }>(
+      `${this.baseUrl}/guess`,
+      { "id": 1, "letter": letter }
+    ).subscribe({
       next: res => {
-        // Update key state for the guessed letter
-        const current = this.vmSubject.getValue();
-        const keyStates = { ...current.keyStates };
-        const upLetter = letter.toUpperCase();
-        const isCorrect = (res.maskedWord || '').toUpperCase().includes(upLetter);
-        keyStates[upLetter] = isCorrect ? 'correct' : 'wrong';
+        const keyStates = { ...this.vmSubject.value.keyStates };
+        keyStates[letter] = res.maskedWord.includes(letter) ? 'correct' : 'wrong';
 
         this.vmSubject.next({
-          maskedWord: res.maskedWord || current.maskedWord,
-          errorsCount: res.failedAttempts || current.errorsCount,
+          maskedWord: res.maskedWord,
+          errorsCount: res.failedAttempts,
           keyStates,
-          lastStatus: isCorrect ? 'correct' : 'wrong',
-          lastMessage: res.message || ''
+          lastStatus: 'neutral',
+          lastMessage: ''
         });
       },
       error: err => {
-        const current = this.vmSubject.getValue();
+        console.error('POST /start fehlgeschlagen:', err);
         this.vmSubject.next({
-          ...current,
-          lastStatus: 'neutral',
-          lastMessage: 'Error sending guess: ' + (err?.message || err)
+          ...this.vmSubject.value,
+          lastStatus: 'wrong',
+          lastMessage: err.status === 404 ? 'Spiel nicht gefunden' : 'Serverfehler'
         });
       }
     });

@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { HangmanCanvasComponent } from './components/hangman-canvas/hangman-canvas.component';
 import { WordDisplayComponent } from './components/word-display/word-display.component';
 import { KeyboardComponent } from './components/keyboard/keyboard.component';
 import { StatusDialogComponent } from './components/status-dialog/status-dialog.component';
 import { GameService } from './services/game.service';
+import { HttpClientModule } from '@angular/common/http';
+
 
 //import { Component, OnInit } from '@angular/core';
 
@@ -13,8 +14,8 @@ import { GameService } from './services/game.service';
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule,              // wichtig für *ngIf, *ngFor
     HttpClientModule,
+    CommonModule,              // wichtig für *ngIf, *ngFor
     HangmanCanvasComponent,    // deine Canvas-Komponente
     WordDisplayComponent,      // Wortanzeige
     KeyboardComponent,         // Tastatur
