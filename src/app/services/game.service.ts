@@ -5,9 +5,12 @@ import { BehaviorSubject } from 'rxjs';
 export interface GameVM {
   maskedWord: string;
   errorsCount: number;
+  maxAttempts: number;
   keyStates: Record<string, 'neutral' | 'correct' | 'wrong'>;
   lastStatus: 'neutral' | 'correct' | 'wrong'; 
   lastMessage: string;
+  gameStatus: 'ACTIVE' | 'WON' | 'LOST';
+  isGameOver: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,9 +18,12 @@ export class GameService {
   private vmSubject = new BehaviorSubject<GameVM>({
     maskedWord: '',
     errorsCount: 0,
+    maxAttempts: 15,
     keyStates: {},
     lastStatus: 'neutral',
-    lastMessage: ''
+    lastMessage: '',
+    gameStatus: 'ACTIVE',
+    isGameOver: false
   });
   vm$ = this.vmSubject.asObservable();
 
@@ -27,14 +33,13 @@ export class GameService {
   constructor(private http: HttpClient) {}
 
   startGame(): void {
-    const request = { maxAttempts: 15 };  // 15 maximale Fehler
+    const request = { maxAttempts: 15 };
     
-    this.http.post<{ id: string; maskedWord: string; failedAttempts: number }>(
+    this.http.post<{ id: string; maskedWord: string; failedAttempts: number; maxAttempts: number; status: string }>(
       `${this.baseUrl}`,
       request
     ).subscribe({
-      next: res => {
-        // 👇 WICHTIG: Game ID speichern!
+      next: (res) => {
         this.currentGameId = res.id;
         
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -44,12 +49,15 @@ export class GameService {
         this.vmSubject.next({
           maskedWord: res.maskedWord,
           errorsCount: res.failedAttempts,
+          maxAttempts: res.maxAttempts || 15,
           keyStates,
           lastStatus: 'neutral',
-          lastMessage: ''
+          lastMessage: 'Neues Spiel gestartet!',
+          gameStatus: 'ACTIVE',
+          isGameOver: false
         });
       },
-      error: err => {
+      error: (err) => {
         console.error('POST /start fehlgeschlagen:', err);
         this.vmSubject.next({
           ...this.vmSubject.value,
@@ -60,31 +68,62 @@ export class GameService {
     });
   }
 
-  guessLetter(letter: string) {
-    // Prüfe ob Game ID existiert
+  guessLetter(letter: string): void {
     if (!this.currentGameId) {
       console.error('Keine aktive Game ID. Starte neues Spiel.');
       this.startGame();
       return;
     }
 
-    this.http.post<{ id: string; maskedWord: string; failedAttempts: number }>(
+    const currentVm = this.vmSubject.value;
+    if (currentVm.isGameOver) {
+      console.warn('Spiel ist bereits beendet!');
+      return;
+    }
+
+    this.http.post<{ id: string; maskedWord: string; failedAttempts: number; maxAttempts: number; status: string; message?: string }>(
       `${this.baseUrl}/guess`,
       { "id": this.currentGameId, "letter": letter }
     ).subscribe({
-      next: res => {
+      next: (res) => {
         const keyStates = { ...this.vmSubject.value.keyStates };
-        keyStates[letter] = res.maskedWord.includes(letter) ? 'correct' : 'wrong';
+        const wasCorrect = res.maskedWord.includes(letter);
+        keyStates[letter] = wasCorrect ? 'correct' : 'wrong';
+
+        const gameStatus = res.status as 'ACTIVE' | 'WON' | 'LOST';
+        const isGameOver = gameStatus === 'WON' || gameStatus === 'LOST';
+        
+        let lastMessage = '';
+        if (gameStatus === 'LOST') {
+          lastMessage = '😢 Verloren! Das Wort war: ' + res.maskedWord;
+        } else if (gameStatus === 'WON') {
+          lastMessage = '🎉 Gewonnen! Das Wort wurde erraten!';
+        } else if (wasCorrect) {
+          lastMessage = '✅ Richtig geraten!';
+        } else {
+          lastMessage = '❌ Falsch geraten!';
+        }
 
         this.vmSubject.next({
           maskedWord: res.maskedWord,
           errorsCount: res.failedAttempts,
+          maxAttempts: res.maxAttempts || this.vmSubject.value.maxAttempts,
           keyStates,
-          lastStatus: 'neutral',
-          lastMessage: ''
+          lastStatus: wasCorrect ? 'correct' : 'wrong',
+          lastMessage,
+          gameStatus,
+          isGameOver
         });
+
+        if (isGameOver) {
+          setTimeout(() => {
+            if (confirm(lastMessage + '\n\nNeues Spiel starten?')) {
+              this.startGame();
+            }
+          }, 1000);
+        }
       },
-      error: err => {
+      error: (err) => {
         console.error('POST /guess fehlgeschlagen:', err);
         this.vmSubject.next({
           ...this.vmSubject.value,
