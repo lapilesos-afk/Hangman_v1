@@ -36,6 +36,26 @@ public class HangmanService {
     }
     
     /**
+     * Starts a new game with a random word and specified maximum attempts
+     * @param maxAttempts the maximum number of attempts for the game
+     * @return the newly created Game
+     */
+    public Game startNewGame(int maxAttempts) {
+        log.info("Starting new Hangman game with max attempts: {}", maxAttempts);
+        
+        String randomWord = WordProvider.getRandomWord();
+        Game game = new Game(randomWord);
+        game.setMaxAttempts(maxAttempts);  // Set maximum attempts from client
+        
+        // Save to repository
+        Game savedGame = gameRepository.save(game);
+        log.info("Game created with ID: {}, Word: {}, Max Attempts: {}", 
+                 savedGame.getId(), randomWord, maxAttempts);
+        
+        return savedGame;
+    }
+    
+    /**
      * Processes a guess for a specific game
      * @param gameId the game ID
      * @param letter the guessed letter

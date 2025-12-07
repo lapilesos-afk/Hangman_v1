@@ -62,7 +62,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "problemMatcher": "$maven"
+      "problemMatcher": []
     },
     {
       "label": "maven: spring-boot:run (backend debug)",
@@ -83,21 +83,20 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false
+        "focus": false,
+        "panel": "shared"
       },
       "problemMatcher": {
-        "pattern": "$maven",
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": ".*BUILD SUCCESS.*"
-          },
-          "endsPattern": {
-            "regexp": ".*Tomcat started.*"
-          }
+          "beginsPattern": "^.*BUILD SUCCESS.*$",
+          "endsPattern": "^.*Tomcat started on port.*$"
         }
       }
     },
@@ -110,26 +109,55 @@
         "cd backend && set JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 && mvn spring-boot:run -DskipTests"
       ],
       "cwd": "${workspaceFolder}",
+      "isBackground": true,
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false
+        "panel": "shared"
       },
       "problemMatcher": {
-        "pattern": "$maven",
+        "pattern": {
+          "regexp": "^(.*)$"
+        },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": ".*Started HangmanServiceApplication.*|.*Tomcat started.*"
-          },
-          "endsPattern": {
-            "regexp": ".*Press Ctrl\\+C to stop.*"
-          }
+          "beginsPattern": "^.*Building jar.*$",
+          "endsPattern": "^.*Tomcat started on port.*$"
         }
       }
+    },
+    {
+      "label": "start backend and frontend",
+      "type": "shell",
+      "dependsOn": [
+        "maven: spring-boot:run (backend debug)",
+        "npm: start"
+      ],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "stop backend and frontend",
+      "type": "shell",
+      "command": "taskkill",
+      "args": [
+        "/F",
+        "/IM",
+        "java.exe",
+        "&&",
+        "taskkill",
+        "/F",
+        "/IM",
+        "node.exe"
+      ],
+      "presentation": {
+        "reveal": "silent"
+      },
+      "isBackground": false
     }
   ]
 }

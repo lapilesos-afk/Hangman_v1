@@ -3,6 +3,7 @@ package com.hangman.controller;
 import com.hangman.domain.Game;
 import com.hangman.dto.GameResponse;
 import com.hangman.dto.GuessRequest;
+import com.hangman.dto.StartGameRequest;
 import com.hangman.service.HangmanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +27,12 @@ public class HangmanController {
      * @return 201 Created with game details (id, maskedWord, failedAttempts)
      */
     @PostMapping
-    public ResponseEntity<GameResponse> startGame() {
-        log.info("Received request to start a new game");
-        
-        try {
-            Game game = hangmanService.startNewGame();
-            GameResponse response = GameResponse.fromGame(game);
-            response.setMessage("Game started successfully");
-            
-            return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-        } catch (Exception e) {
-            log.error("Error starting game", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<GameResponse> startGame(@RequestBody(required = false) StartGameRequest request) {
+        int maxAttempts = (request != null && request.getMaxAttempts() > 0) 
+            ? request.getMaxAttempts() 
+            : 15;  // Default: 15
+        Game game = hangmanService.startNewGame(maxAttempts);
+        return ResponseEntity.ok(GameResponse.fromGame(game));
     }
     
     /**

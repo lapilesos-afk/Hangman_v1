@@ -19,7 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
     HangmanCanvasComponent,    // deine Canvas-Komponente
     WordDisplayComponent,      // Wortanzeige
     KeyboardComponent,         // Tastatur
-    StatusDialogComponent      // Statusmeldungen
+    // StatusDialogComponent      // TODO: wird noch nicht verwendet
   ],
   providers: [GameService],
   templateUrl: './app.component.html',

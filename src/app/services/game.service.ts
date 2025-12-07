@@ -21,19 +21,22 @@ export class GameService {
   });
   vm$ = this.vmSubject.asObservable();
 
-// private baseUrl = 'https://fec23180-6141-4c18-bf41-9c61221235d1.mock.pstmn.io/api/hangman';
- private baseUrl = 'http://localhost:8080/api/games';
- // private baseUrl = 'http://localhost:8080/api/hangman'; 
- 
- constructor(private http: HttpClient) {}
+  private baseUrl = 'http://localhost:8080/api/games';
+  private currentGameId: string | null = null;
 
-  startGame() {
-    this.http.post<{ id: Number; maskedWord: string; failedAttempts: number }>(
-      `${this.baseUrl},  // /startGame`, //previous /start
-      {id:0, Buchstabe:''}
+  constructor(private http: HttpClient) {}
+
+  startGame(): void {
+    const request = { maxAttempts: 15 };  // 15 maximale Fehler
+    
+    this.http.post<{ id: string; maskedWord: string; failedAttempts: number }>(
+      `${this.baseUrl}`,
+      request
     ).subscribe({
       next: res => {
-        //console.log('POST /start erfolgreich, Antwort:', res);
+        // 👇 WICHTIG: Game ID speichern!
+        this.currentGameId = res.id;
+        
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
         const keyStates: Record<string, 'neutral' | 'correct' | 'wrong'> = {};
         letters.forEach(l => keyStates[l] = 'neutral');
@@ -58,9 +61,16 @@ export class GameService {
   }
 
   guessLetter(letter: string) {
-    this.http.post<{ maskedWord: string; failedAttempts: number }>(
+    // Prüfe ob Game ID existiert
+    if (!this.currentGameId) {
+      console.error('Keine aktive Game ID. Starte neues Spiel.');
+      this.startGame();
+      return;
+    }
+
+    this.http.post<{ id: string; maskedWord: string; failedAttempts: number }>(
       `${this.baseUrl}/guess`,
-      { "id": 1, "letter": letter }
+      { "id": this.currentGameId, "letter": letter }
     ).subscribe({
       next: res => {
         const keyStates = { ...this.vmSubject.value.keyStates };
@@ -75,7 +85,7 @@ export class GameService {
         });
       },
       error: err => {
-        console.error('POST /start fehlgeschlagen:', err);
+        console.error('POST /guess fehlgeschlagen:', err);
         this.vmSubject.next({
           ...this.vmSubject.value,
           lastStatus: 'wrong',
