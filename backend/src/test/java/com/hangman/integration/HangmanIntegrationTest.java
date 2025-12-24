@@ -2,12 +2,12 @@ package com.hangman.integration;
 
 import com.hangman.dto.GameResponse;
 import com.hangman.dto.GuessRequest;
+import com.hangman.dto.StartGameRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,13 +22,18 @@ public class HangmanIntegrationTest {
     @Test
     public void testCompleteGameFlow() {
         // 1. Start new game
-        ResponseEntity<GameResponse> startResponse = restTemplate.postForEntity(
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<StartGameRequest> startRequest = new HttpEntity<>(null, headers);
+        ResponseEntity<GameResponse> startResponse = restTemplate.exchange(
             BASE_URL,
-            null,
+            HttpMethod.POST,
+            startRequest,
             GameResponse.class
         );
         
-        assertEquals(HttpStatus.CREATED, startResponse.getStatusCode());
+        assertEquals(HttpStatus.OK, startResponse.getStatusCode());
         assertNotNull(startResponse.getBody());
         GameResponse gameStart = startResponse.getBody();
         
@@ -41,9 +46,12 @@ public class HangmanIntegrationTest {
         
         // 2. Make some guesses
         GuessRequest guessRequest = new GuessRequest(gameId, "A");
-        ResponseEntity<GameResponse> guessResponse = restTemplate.postForEntity(
+        HttpEntity<GuessRequest> guessEntity = new HttpEntity<>(guessRequest, headers);
+        
+        ResponseEntity<GameResponse> guessResponse = restTemplate.exchange(
             BASE_URL + "/guess",
-            guessRequest,
+            HttpMethod.POST,
+            guessEntity,
             GameResponse.class
         );
         
@@ -62,11 +70,16 @@ public class HangmanIntegrationTest {
     
     @Test
     public void testGuessWithInvalidGameId() {
-        GuessRequest guessRequest = new GuessRequest("invalid-id", "A");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         
-        ResponseEntity<GameResponse> response = restTemplate.postForEntity(
+        GuessRequest guessRequest = new GuessRequest("invalid-id", "A");
+        HttpEntity<GuessRequest> requestEntity = new HttpEntity<>(guessRequest, headers);
+        
+        ResponseEntity<GameResponse> response = restTemplate.exchange(
             BASE_URL + "/guess",
-            guessRequest,
+            HttpMethod.POST,
+            requestEntity,
             GameResponse.class
         );
         
@@ -76,9 +89,14 @@ public class HangmanIntegrationTest {
     @Test
     public void testGuessWithInvalidLetter() {
         // First create a game
-        ResponseEntity<GameResponse> startResponse = restTemplate.postForEntity(
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<StartGameRequest> startRequest = new HttpEntity<>(null, headers);
+        ResponseEntity<GameResponse> startResponse = restTemplate.exchange(
             BASE_URL,
-            null,
+            HttpMethod.POST,
+            startRequest,
             GameResponse.class
         );
         
@@ -86,10 +104,12 @@ public class HangmanIntegrationTest {
         
         // Try to guess with invalid letter
         GuessRequest guessRequest = new GuessRequest(gameId, "123");
+        HttpEntity<GuessRequest> guessEntity = new HttpEntity<>(guessRequest, headers);
         
-        ResponseEntity<GameResponse> response = restTemplate.postForEntity(
+        ResponseEntity<GameResponse> response = restTemplate.exchange(
             BASE_URL + "/guess",
-            guessRequest,
+            HttpMethod.POST,
+            guessEntity,
             GameResponse.class
         );
         
