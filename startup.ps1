@@ -185,9 +185,10 @@ Write-Host ""
 Write-Host "  [1] Launching Backend on port $BACKEND_PORT..."
 $backendLog = Join-Path $LOG_DIR "backend.log"
 $backendProcess = Start-Process -FilePath "powershell" -ArgumentList @(
+    "-NoExit",
     "-Command",
-    "cd '$BACKEND_DIR'; mvn spring-boot:run 2> '$backendLog'; Read-Host 'Press Enter to exit'"
-) -PassThru -NoNewWindow
+    "cd '$BACKEND_DIR'; mvn spring-boot:run *> '$backendLog'"
+) -PassThru
 
 Write-Status "      [OK] Backend starting..." -Color $SUCCESS
 
@@ -199,9 +200,10 @@ Start-Sleep -Seconds 15
 Write-Host "  [2] Launching Frontend on port $FRONTEND_PORT..."
 $frontendLog = Join-Path $LOG_DIR "frontend.log"
 $frontendProcess = Start-Process -FilePath "powershell" -ArgumentList @(
+    "-NoExit",
     "-Command",
-    "cd '$FRONTEND_DIR'; npm start 2> '$frontendLog'; Read-Host 'Press Enter to exit'"
-) -PassThru -NoNewWindow
+    "cd '$FRONTEND_DIR'; .\node_modules\.bin\ng serve *> '$frontendLog'"
+) -PassThru
 
 Write-Status "      [OK] Frontend starting..." -Color $SUCCESS
 

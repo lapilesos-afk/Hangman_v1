@@ -102,7 +102,7 @@ echo.
 echo ============================================================================
 echo Starting Frontend (Angular on port 4200)...
 echo ============================================================================
-start "Hangman Frontend" cmd /k "cd /d "%FRONTEND_DIR%" && npm start"
+start "Hangman Frontend" cmd /k "cd /d "%FRONTEND_DIR%" && node_modules\.bin\ng serve"
 
 REM Wait a bit for frontend to start
 timeout /t 5 /nobreak
