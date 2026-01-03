@@ -42,7 +42,7 @@ export class GameService {
       next: (res) => {
         this.currentGameId = res.id;
         
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ'.split('');
         const keyStates: Record<string, 'neutral' | 'correct' | 'wrong'> = {};
         letters.forEach(l => keyStates[l] = 'neutral');
 
@@ -87,8 +87,14 @@ export class GameService {
     ).subscribe({
       next: (res) => {
         const keyStates = { ...this.vmSubject.value.keyStates };
-        const wasCorrect = res.maskedWord.includes(letter);
+        const wasCorrect = res.maskedWord.includes(letter) || this.checkUmlautEquivalent(letter, res.maskedWord);
         keyStates[letter] = wasCorrect ? 'correct' : 'wrong';
+        
+        // Mark equivalent letter with same state
+        const equivalent = this.getUmlautEquivalent(letter);
+        if (equivalent) {
+          keyStates[equivalent] = wasCorrect ? 'correct' : 'wrong';
+        }
 
         const gameStatus = res.status as 'ACTIVE' | 'WON' | 'LOST';
         const isGameOver = gameStatus === 'WON' || gameStatus === 'LOST';
@@ -132,5 +138,24 @@ export class GameService {
         });
       }
     });
+  }
+  
+  private checkUmlautEquivalent(letter: string, maskedWord: string): boolean {
+    const equivalents: Record<string, string> = {
+      'A': 'Ä', 'Ä': 'A',
+      'O': 'Ö', 'Ö': 'O',
+      'U': 'Ü', 'Ü': 'U'
+    };
+    const equivalent = equivalents[letter];
+    return equivalent ? maskedWord.includes(equivalent) : false;
+  }
+  
+  private getUmlautEquivalent(letter: string): string | null {
+    const equivalents: Record<string, string> = {
+      'A': 'Ä', 'Ä': 'A',
+      'O': 'Ö', 'Ö': 'O',
+      'U': 'Ü', 'Ü': 'U'
+    };
+    return equivalents[letter] || null;
   }
 }

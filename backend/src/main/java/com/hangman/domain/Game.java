@@ -62,10 +62,10 @@ public class Game {
             ? String.valueOf(letter) 
             : guessedLetters + "," + letter;
         
-        // Check if letter is in word
-        if (word.contains(String.valueOf(letter))) {
+        // Check if letter or equivalent is in word
+        if (checkLetterOrAequivalent(letter)) {
             // Update masked word
-            maskedWord = updateMaskedWord(letter);
+            maskedWord = maskLetterOrAequivalent(letter);
             
             // Check if won
             if (maskedWord.replace(" ", "").equals(word)) {
@@ -90,23 +90,38 @@ public class Game {
     }
     
     /**
-     * Masks the word with underscores, revealing guessed letters
+     * Checks if letter or its umlaut equivalent is in the word
      */
-    private String maskWord(String word) {
-        return String.join(" ", word.split("")).replaceAll("[A-Z]", "_");
+    private boolean checkLetterOrAequivalent(char letter) {
+        String letterStr = String.valueOf(letter);
+        if (word.contains(letterStr)) {
+            return true;
+        }
+        
+        // Check umlaut equivalents
+        switch (letter) {
+            case 'A': return word.contains("Ä");
+            case 'Ä': return word.contains("A");
+            case 'O': return word.contains("Ö");
+            case 'Ö': return word.contains("O");
+            case 'U': return word.contains("Ü");
+            case 'Ü': return word.contains("U");
+            default: return false;
+        }
     }
     
     /**
-     * Updates the masked word with a correct letter
+     * Updates masked word by revealing the letter and its umlaut equivalent
      */
-    private String updateMaskedWord(char letter) {
+    private String maskLetterOrAequivalent(char letter) {
         StringBuilder result = new StringBuilder();
         String[] chars = word.split("");
         String[] masked = maskedWord.split(" ");
         
         for (int i = 0; i < chars.length; i++) {
-            if (chars[i].toUpperCase().equals(String.valueOf(letter))) {
-                result.append(letter);
+            char wordChar = chars[i].charAt(0);
+            if (isLetterMatch(wordChar, letter)) {
+                result.append(wordChar);
             } else {
                 result.append(masked[i].isEmpty() ? "_" : masked[i]);
             }
@@ -117,6 +132,32 @@ public class Game {
         }
         
         return result.toString();
+    }
+    
+    /**
+     * Checks if two letters match or are umlaut equivalents
+     */
+    private boolean isLetterMatch(char wordChar, char guessedChar) {
+        wordChar = Character.toUpperCase(wordChar);
+        guessedChar = Character.toUpperCase(guessedChar);
+        
+        if (wordChar == guessedChar) {
+            return true;
+        }
+        
+        return (wordChar == 'A' && guessedChar == 'Ä') ||
+               (wordChar == 'Ä' && guessedChar == 'A') ||
+               (wordChar == 'O' && guessedChar == 'Ö') ||
+               (wordChar == 'Ö' && guessedChar == 'O') ||
+               (wordChar == 'U' && guessedChar == 'Ü') ||
+               (wordChar == 'Ü' && guessedChar == 'U');
+    }
+    
+    /**
+     * Masks the word with underscores, revealing guessed letters
+     */
+    private String maskWord(String word) {
+        return String.join(" ", word.split("")).replaceAll("\\p{L}", "_");
     }
     
     public boolean isGameOver() {

@@ -9,7 +9,8 @@ public class WordProvider {
         "AUTO", "KATZE", "HUND", "BAUM", "HAUS", "COMPUTER", "PROGRAMM",
         "JAVA", "SPRING", "BOOT", "DATABASE", "ENTWICKLER", "HANGMAN",
         "ALPHABET", "BUCHSTABE", "SPIEL", "SIEG", "NIEDERLAGE", "WORT",
-        "SCHULE", "STUDIUM", "PROJEKT", "LÖSUNG", "FEHLER", "VERSUCH"
+        "SCHULE", "STUDIUM", "PROJEKT", "LÖSUNG", "FEHLER", "VERSUCH",
+        "MÜNCHEN", "KÖLN", "ZÜRICH", "GRÜN", "SCHÖN", "ÜBUNG", "TÜR"
     );
     
     private static final Random RANDOM = new Random();
