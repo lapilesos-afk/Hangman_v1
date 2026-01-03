@@ -59,6 +59,23 @@ if errorlevel 1 (
 )
 echo.
 
+REM Check npm dependencies
+echo [CHECK] Frontend dependencies (node_modules)
+if not exist "node_modules" (
+    echo [WARNING] node_modules not found
+    echo [INFO]    Installing npm dependencies...
+    call npm install
+    if errorlevel 1 (
+        echo [ERROR] npm install failed
+        if "!ERRORS!"=="0" set "ERRORS=1"
+    ) else (
+        echo [OK]    npm dependencies installed
+    )
+) else (
+    echo [OK]    node_modules exists
+)
+echo.
+
 REM Summary
 echo ============================================================================
 echo SUMMARY

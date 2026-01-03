@@ -158,13 +158,22 @@ Write-Host "  [2] Checking Frontend dependencies..."
 Push-Location $FRONTEND_DIR
 try {
     if (-not (Test-Path "node_modules")) {
-        Write-Host "      Installing npm packages..."
-        & npm install -q 2> (Join-Path $LOG_DIR "npm-install.log")
+        Write-Host "      Installing npm packages (node_modules not found)..."
+        $npmOutput = & npm install 2>&1
+        $npmOutput | Out-File -FilePath (Join-Path $LOG_DIR "npm-install.log")
         if ($LASTEXITCODE -ne 0) {
-            Write-Status "      [WARNING] npm install had issues. Continuing anyway..." -Color $WARNING
+            Write-Status "      [ERROR] npm install failed!" -Color $ERROR_COLOR
+            Write-Host "      Check logs at: $(Join-Path $LOG_DIR 'npm-install.log')"
+            exit 1
         }
+        Write-Status "      [OK] npm packages installed" -Color $SUCCESS
+    } else {
+        Write-Host "      Verifying npm packages..."
+        $ErrorActionPreference = "Continue"
+        & npm install --prefer-offline --no-audit 2>&1 | Out-Null
+        $ErrorActionPreference = "Stop"
+        Write-Status "      [OK] Frontend ready" -Color $SUCCESS
     }
-    Write-Status "      [OK] Frontend ready" -Color $SUCCESS
 } finally {
     Pop-Location
 }

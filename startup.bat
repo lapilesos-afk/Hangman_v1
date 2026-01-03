@@ -80,8 +80,16 @@ REM Find the generated JAR file
 echo [5/5] Preparing Frontend...
 cd /d "%FRONTEND_DIR%"
 if not exist "node_modules" (
-    echo Installing npm dependencies...
-    call npm install -q
+    echo Installing npm dependencies ^(node_modules not found^)...
+    call npm install
+    if errorlevel 1 (
+        echo [ERROR] npm install failed
+        pause
+        exit /b 1
+    )
+) else (
+    echo Checking npm dependencies...
+    call npm install --prefer-offline --no-audit
 )
 echo [OK] Frontend ready
 echo.
