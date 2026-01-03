@@ -39,7 +39,7 @@ if "%~1"=="" (
 REM Definiere Ausgabeverzeichnis und Namen
 set "ARTIFACT_DIR=.\artifact"
 set "ARTIFACT_NAME=hangman-artifact-!VERSION!.zip"
-set "ARTIFACT_PATH=%ARTIFACT_DIR%\%ARTIFACT_NAME%"
+set "ARTIFACT_PATH=.\%ARTIFACT_NAME%"
 
 echo [INFO] Cleanup old artifacts...
 if exist "%ARTIFACT_DIR%" (
