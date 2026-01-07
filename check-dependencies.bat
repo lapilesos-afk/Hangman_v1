@@ -3,7 +3,7 @@ REM ============================================================================
 REM Hangman Game - Dependency Check Script
 REM ============================================================================
 
-setlocal
+setlocal enabledelayedexpansion
 
 cls
 echo.
@@ -12,17 +12,20 @@ echo HANGMAN - System Requirements Check
 echo ============================================================================
 echo.
 
-set "ERRORS=0"
-set "WARNINGS=0"
+set "JAVA_OK=0"
+set "MAVEN_OK=0"
+set "NODE_OK=0"
+set "NPM_OK=0"
+set "DEPS_OK=0"
 
 REM Check Java
 echo [CHECK] Java Development Kit (JDK)
 where java >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Java is NOT installed
-    set "ERRORS=1"
 ) else (
-    echo [OK]    Java is installed
+    echo [SUCCESS] Java is installed
+    set "JAVA_OK=1"
 )
 echo.
 
@@ -31,9 +34,9 @@ echo [CHECK] Apache Maven
 where mvn >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Maven is NOT installed
-    if "!ERRORS!"=="0" set "ERRORS=1"
 ) else (
-    echo [OK]    Maven is installed
+    echo [SUCCESS] Maven is installed
+    set "MAVEN_OK=1"
 )
 echo.
 
@@ -42,9 +45,9 @@ echo [CHECK] Node.js
 where node >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Node.js is NOT installed
-    if "!ERRORS!"=="0" set "ERRORS=1"
 ) else (
-    echo [OK]    Node.js is installed
+    echo [SUCCESS] Node.js is installed
+    set "NODE_OK=1"
 )
 echo.
 
@@ -53,9 +56,9 @@ echo [CHECK] npm
 where npm >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] npm is NOT installed
-    if "!ERRORS!"=="0" set "ERRORS=1"
 ) else (
-    echo [OK]    npm is installed
+    echo [SUCCESS] npm is installed
+    set "NPM_OK=1"
 )
 echo.
 
@@ -63,16 +66,21 @@ REM Check npm dependencies
 echo [CHECK] Frontend dependencies (node_modules)
 if not exist "node_modules" (
     echo [WARNING] node_modules not found
-    echo [INFO]    Installing npm dependencies...
-    call npm install
-    if errorlevel 1 (
-        echo [ERROR] npm install failed
-        if "!ERRORS!"=="0" set "ERRORS=1"
+    if "!NPM_OK!"=="1" (
+        echo [INFO]    Installing npm dependencies...
+        call npm install
+        if errorlevel 1 (
+            echo [ERROR] npm install failed
+        ) else (
+            echo [SUCCESS] npm dependencies installed
+            set "DEPS_OK=1"
+        )
     ) else (
-        echo [OK]    npm dependencies installed
+        echo [SKIP]    npm not available - cannot install dependencies
     )
 ) else (
-    echo [OK]    node_modules exists
+    echo [SUCCESS] node_modules exists
+    set "DEPS_OK=1"
 )
 echo.
 
@@ -82,7 +90,8 @@ echo SUMMARY
 echo ============================================================================
 echo.
 
-if "%ERRORS%"=="0" (
+REM Check if all required dependencies are present
+if "!JAVA_OK!"=="1" if "!MAVEN_OK!"=="1" if "!NODE_OK!"=="1" if "!NPM_OK!"=="1" if "!DEPS_OK!"=="1" (
     echo [SUCCESS] All required dependencies are installed!
     echo.
     echo You can now run:
@@ -92,12 +101,35 @@ if "%ERRORS%"=="0" (
 ) else (
     echo [FAILED] Some required dependencies are missing!
     echo.
-    echo Please install the missing packages and try again.
+    echo Missing components:
+    if "!JAVA_OK!"=="0" echo   - Java Development Kit (JDK)
+    if "!MAVEN_OK!"=="0" echo   - Apache Maven
+    if "!NODE_OK!"=="0" echo   - Node.js
+    if "!NPM_OK!"=="0" echo   - npm
+    if "!DEPS_OK!"=="0" echo   - Frontend dependencies (node_modules)
+    echo.
+    echo Next steps:
+    if "!JAVA_OK!"=="0" (
+        echo 1. Install Java JDK 17 or higher
+        echo    Download: https://adoptium.net/
+    )
+    if "!MAVEN_OK!"=="0" (
+        echo 2. Install Apache Maven
+        echo    Download: https://maven.apache.org/download.cgi
+    )
+    if "!NODE_OK!"=="0" (
+        echo 3. Install Node.js (includes npm)
+        echo    Download: https://nodejs.org/
+    )
+    if "!NPM_OK!"=="1" if "!DEPS_OK!"=="0" (
+        echo 4. Run 'npm install' to install frontend dependencies
+    )
+    echo.
+    echo After installing the missing components, run this script again.
     echo.
 )
 
 echo ============================================================================
 echo.
-timeout /t 3 /nobreak
+timeout /t 5 /nobreak
 endlocal
-
