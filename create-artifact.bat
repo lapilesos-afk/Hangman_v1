@@ -182,17 +182,19 @@ REM start-all.bat für Artifact
     echo :wait_backend
     echo timeout /t 2 /nobreak ^>nul
     echo netstat -ano ^| find "8080" ^| find "LISTENING" ^>nul 2^>^&1
-    echo if errorlevel 1 ^(
-    echo     set /a WAIT_COUNT+=1
-    echo     if ^^!WAIT_COUNT^^! LSS 15 ^(
-    echo         echo [INFO] Still waiting... (attempt ^^!WAIT_COUNT^^!/15^)
-    echo         goto wait_backend
-    echo     ^) else ^(
-    echo         echo [WARNING] Backend did not start within 30 seconds
-    echo         echo [WARNING] Please check the Backend window for errors
-    echo     ^)
-    echo ^)
-    echo if ^^!WAIT_COUNT^^! LSS 15 echo [OK] Backend is ready on: http://localhost:8080
+    echo if not errorlevel 1 goto backend_ready
+    echo set /a WAIT_COUNT+=1
+    echo if ^^!WAIT_COUNT^^! GEQ 15 goto backend_timeout
+    echo echo [INFO] Still waiting... ^^^(attempt ^^!WAIT_COUNT^^!/15^^^)
+    echo goto wait_backend
+    echo.
+    echo :backend_timeout
+    echo echo [WARNING] Backend did not start within 30 seconds
+    echo echo [WARNING] Please check the Backend window for errors
+    echo goto end
+    echo.
+    echo :backend_ready
+    echo echo [OK] Backend is ready on: http://localhost:8080
     echo echo.
     echo echo [2/2] Starting Frontend...
     echo echo.
