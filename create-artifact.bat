@@ -169,6 +169,7 @@ REM start-backend.bat für Artifact
 REM start-all.bat für Artifact
 (
     echo @echo off
+    echo setlocal enabledelayedexpansion
     echo REM Hangman Full Stack Starter
     echo echo ========================================
     echo echo Hangman Game - Startup
@@ -176,9 +177,22 @@ REM start-all.bat für Artifact
     echo echo.
     echo echo [1/2] Starting Backend...
     echo start "Hangman Backend" cmd /k "start-backend.bat --no-pause"
-    echo echo [INFO] Waiting for backend to initialize (15 seconds^)...
-    echo timeout /t 15 /nobreak ^>nul
-    echo echo [OK] Backend should be ready on: http://localhost:8080
+    echo echo [INFO] Waiting for backend to start on port 8080...
+    echo set WAIT_COUNT=0
+    echo :wait_backend
+    echo timeout /t 2 /nobreak ^>nul
+    echo netstat -ano ^| find "8080" ^| find "LISTENING" ^>nul 2^>^&1
+    echo if errorlevel 1 ^(
+    echo     set /a WAIT_COUNT+=1
+    echo     if ^^!WAIT_COUNT^^! LSS 15 ^(
+    echo         echo [INFO] Still waiting... (attempt ^^!WAIT_COUNT^^!/15^)
+    echo         goto wait_backend
+    echo     ^) else ^(
+    echo         echo [WARNING] Backend did not start within 30 seconds
+    echo         echo [WARNING] Please check the Backend window for errors
+    echo     ^)
+    echo ^)
+    echo if ^^!WAIT_COUNT^^! LSS 15 echo [OK] Backend is ready on: http://localhost:8080
     echo echo.
     echo echo [2/2] Starting Frontend...
     echo echo.
