@@ -158,11 +158,12 @@ REM start-backend.bat für Artifact
 (
     echo @echo off
     echo REM Hangman Backend Starter
+    echo REM Usage: start-backend.bat [--no-pause]
     echo echo Starting Hangman Backend...
     echo echo.
     echo cd backend
     echo java -jar hangman-service-1.0.0.jar
-    echo pause
+    echo if "%%~1" NEQ "--no-pause" pause
 ) > "%ARTIFACT_DIR%\start-backend.bat"
 
 REM start-all.bat für Artifact
@@ -174,41 +175,45 @@ REM start-all.bat für Artifact
     echo echo ========================================
     echo echo.
     echo echo [1/2] Starting Backend...
-    echo start "Hangman Backend" cmd /k "start-backend.bat"
-    echo timeout /t 3 /nobreak ^>nul
-    echo echo [OK] Backend started on: http://localhost:8080
+    echo start "Hangman Backend" cmd /k "start-backend.bat --no-pause"
+    echo echo [INFO] Waiting for backend to initialize (15 seconds^)...
+    echo timeout /t 15 /nobreak ^>nul
+    echo echo [OK] Backend should be ready on: http://localhost:8080
     echo echo.
     echo echo [2/2] Starting Frontend...
     echo echo.
     echo REM Try npx http-server
-    echo where npx ^>nul 2^^^>^^^&1
-    echo if %%ERRORLEVEL%% EQU 0 ^(
-    echo     start "Hangman Frontend" cmd /k "npx http-server frontend -p 4200"
-    echo     echo [INFO] Waiting for servers to start...
-    echo     timeout /t 8 /nobreak ^>nul
-    echo     echo [OK] Frontend started on: http://localhost:4200
-    echo     echo.
-    echo     echo Opening browser...
-    echo     start http://localhost:4200
-    echo     goto end
-    echo ^)
+    echo where npx ^>nul 2^>^&1
+    echo if errorlevel 1 goto try_http_server
+    echo start "Hangman Frontend" cmd /k "npx http-server frontend -p 4200"
+    echo echo [INFO] Waiting for frontend to start (5 seconds^)...
+    echo timeout /t 5 /nobreak ^>nul
+    echo echo [OK] Frontend started on: http://localhost:4200
+    echo echo.
+    echo echo Opening browser...
+    echo timeout /t 2 /nobreak ^>nul
+    echo start http://localhost:4200
+    echo goto end
     echo.
+    echo :try_http_server
     echo REM Try http-server
-    echo where http-server ^>nul 2^^^>^^^&1
-    echo if %%ERRORLEVEL%% EQU 0 ^(
-    echo     start "Hangman Frontend" cmd /k "http-server frontend -p 4200"
-    echo     echo [INFO] Waiting for servers to start...
-    echo     timeout /t 8 /nobreak ^>nul
-    echo     echo [OK] Frontend started on: http://localhost:4200
-    echo     echo.
-    echo     echo Opening browser...
-    echo     start http://localhost:4200
-    echo     goto end
-    echo ^)
+    echo where http-server ^>nul 2^>^&1
+    echo if errorlevel 1 goto no_server
+    echo start "Hangman Frontend" cmd /k "http-server frontend -p 4200"
+    echo echo [INFO] Waiting for frontend to start (5 seconds^)...
+    echo timeout /t 5 /nobreak ^>nul
+    echo echo [OK] Frontend started on: http://localhost:4200
+    echo echo.
+    echo echo Opening browser...
+    echo timeout /t 2 /nobreak ^>nul
+    echo start http://localhost:4200
+    echo goto end
     echo.
-    echo echo [WARNING] No Node.js web server found!
+    echo :no_server
+    echo echo [WARNING] No Node.js web server found
     echo echo Please install: npm install -g http-server
     echo echo.
+    echo.
     echo :end
     echo pause
 ) > "%ARTIFACT_DIR%\start-all.bat"
