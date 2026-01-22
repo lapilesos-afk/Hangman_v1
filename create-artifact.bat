@@ -181,7 +181,8 @@ REM start-all.bat für Artifact
     echo set WAIT_COUNT=0
     echo :wait_backend
     echo timeout /t 2 /nobreak ^>nul
-    echo netstat -ano ^| find "8080" ^| find "LISTENING" ^>nul 2^>^&1
+    echo REM Prüfe einfach ob Port 8080 verwendet wird (sprachunabhängig^)
+    echo netstat -ano ^| findstr ":8080 " ^>nul 2^>^&1
     echo if not errorlevel 1 goto backend_ready
     echo set /a WAIT_COUNT+=1
     echo if ^^!WAIT_COUNT^^! GEQ 15 goto backend_timeout
