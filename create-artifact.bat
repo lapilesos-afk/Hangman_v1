@@ -235,9 +235,6 @@ REM start-all.bat für Artifact
     echo pause
 ) > "%ARTIFACT_DIR%\start-all.bat"
 
-REM Kopiere nützliche Scripts
-xcopy /y /q "stop-services.bat" "%ARTIFACT_DIR%\" >nul 2>&1
-
 REM README für Artifact
 echo [INFO] Creating artifact README...
 (
